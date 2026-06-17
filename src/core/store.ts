@@ -118,3 +118,27 @@ export function writeOutput(slug: string, filename: string, content: string): st
   writeFileSync(p, content);
   return p;
 }
+
+export interface Trend {
+  trend: string;
+  keywords: string[];
+  status: "pending" | "fired";
+  eta?: string;
+  addedAt: string;
+  firedSlug?: string;
+}
+
+export function loadTrends(): Trend[] {
+  const p = resolve(ROOT(), "trends.json");
+  if (!existsSync(p)) return [];
+  try {
+    return JSON.parse(readFileSync(p, "utf8"));
+  } catch {
+    return [];
+  }
+}
+
+export function saveTrends(trends: Trend[]): void {
+  mkdirSync(ROOT(), { recursive: true });
+  writeFileSync(resolve(ROOT(), "trends.json"), JSON.stringify(trends, null, 2));
+}

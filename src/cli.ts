@@ -20,6 +20,7 @@ import { cmdPublish } from "./commands/publish.js";
 import { cmdInit, cmdChannels } from "./commands/setup.js";
 import { cmdRepeg } from "./commands/repeg.js";
 import { cmdStock } from "./commands/stock.js";
+import { cmdTrend } from "./commands/trend.js";
 import { log, color } from "./core/util/log.js";
 
 const HELP = `${color.bold("riff")} — one source, every channel. Agent-native content repurposing.
@@ -38,6 +39,7 @@ ${color.bold("Commands")}
   repurpose <slug|url>     Generate the bundle  [--llm --trend "..." --publish]
   repeg <slug>             Swap the X article's trend, fire first  [--trend "..." --llm]
   stock                    Stockpile dashboard — what's ready to fire
+  trend                    Trend watchlist + fire planner  [--add --fire --remove --llm]
   publish <slug>           Render markdown + ship  [--channel a,b | --all]
   init                     Set product context  [--name --one-liner --url --cta-link]
   channels                 List channels and their config status
@@ -73,6 +75,11 @@ async function main() {
       "one-liner": { type: "string" },
       url: { type: "string" },
       "cta-link": { type: "string" },
+      add: { type: "string" },
+      remove: { type: "string" },
+      fire: { type: "string" },
+      keywords: { type: "string" },
+      eta: { type: "string" },
     },
   });
 
@@ -102,6 +109,16 @@ async function main() {
       break;
     case "stock":
       cmdStock();
+      break;
+    case "trend":
+      await cmdTrend({
+        add: values.add,
+        remove: values.remove,
+        fire: values.fire,
+        keywords: values.keywords,
+        eta: values.eta,
+        llm: values.llm,
+      });
       break;
     case "publish":
       await cmdPublish({ slug: p0, channel: values.channel, all: values.all });
