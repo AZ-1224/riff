@@ -27,12 +27,24 @@ export const videoChannel: Channel = {
       };
     }
 
+    const avatarId = env("HEYGEN_AVATAR_ID");
+    const voiceId = env("HEYGEN_VOICE_ID");
+    if (!avatarId || !voiceId) {
+      return { channel: "video", ok: false, detail: "Skipped — HEYGEN_AVATAR_ID / HEYGEN_VOICE_ID missing." };
+    }
     const narration = bundle.videoScript.segments.map((s) => s.say).join(" ");
+    if (narration.length > 4500) {
+      return {
+        channel: "video",
+        ok: false,
+        detail: `Narration too long: ${narration.length} chars (HeyGen TTS limit ~5000). Shorten the video script.`,
+      };
+    }
     const payload = {
       video_inputs: [
         {
-          character: { type: "avatar", avatar_id: env("HEYGEN_AVATAR_ID"), avatar_style: "normal" },
-          voice: { type: "text", input_text: narration, voice_id: env("HEYGEN_VOICE_ID") },
+          character: { type: "avatar", avatar_id: avatarId, avatar_style: "normal" },
+          voice: { type: "text", input_text: narration, voice_id: voiceId },
         },
       ],
       dimension: { width: 720, height: 1280 }, // vertical short

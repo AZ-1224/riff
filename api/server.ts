@@ -21,6 +21,8 @@ import {
   loadBundle,
   slugify,
   loadProduct,
+  assertSafeSlug,
+  NotFoundError,
 } from "../src/core/store.js";
 import { SYSTEM_PROMPT, buildUserPrompt } from "../src/core/generate/prompts.js";
 import { generateWithLLM } from "../src/core/generate/llm.js";
@@ -36,17 +38,21 @@ function authed(req: any): boolean {
   return h === `Bearer ${API_KEY}` || h === API_KEY;
 }
 
+class BadRequest extends Error {}
+
 function body(req: any): Promise<any> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     let d = "";
     req.on("data", (c: any) => (d += c));
     req.on("end", () => {
+      if (!d) return resolve({});
       try {
-        resolve(d ? JSON.parse(d) : {});
+        resolve(JSON.parse(d));
       } catch {
-        resolve({});
+        reject(new BadRequest("Malformed JSON body."));
       }
     });
+    req.on("error", reject);
   });
 }
 
@@ -60,6 +66,16 @@ const server = createServer(async (req, res) => {
     const url = new URL(req.url!, `http://localhost:${PORT}`);
     const parts = url.pathname.split("/").filter(Boolean);
     const m = req.method;
+    // Validate any slug in the URL path before it reaches the store (400, not 500).
+    const slugParam = (s: string | undefined): string => {
+      try {
+        assertSafeSlug(s);
+        return s as string;
+      } catch (e: any) {
+        throw new BadRequest(e.message);
+      }
+    };
+    if (["brief", "bundle", "repurpose", "publish"].includes(parts[0]) && parts[1]) parts[1] = slugParam(parts[1]);
 
     if (m === "GET" && parts[0] === "channels") {
       return send(200, CHANNELS.map((c) => ({ name: c.name, description: c.description, configured: c.configured() })));
@@ -68,7 +84,7 @@ const server = createServer(async (req, res) => {
     if (m === "POST" && parts[0] === "ingest") {
       const b = await body(req);
       const source = b.url ? await ingest(b.url) : ingestText(b.text || "", b.title);
-      const slug = b.slug || slugify(source.title);
+      const slug = b.slug ? slugParam(b.slug) : slugify(source.title);
       saveSource(slug, source);
       return send(200, { slug, title: source.title, chars: source.text.length });
     }
@@ -119,10 +135,18 @@ const server = createServer(async (req, res) => {
 
     send(404, { error: "not found" });
   } catch (e: any) {
+    if (e instanceof BadRequest) return send(400, { error: e.message });
+    if (e instanceof NotFoundError) return send(404, { error: e.message });
     send(500, { error: e?.message || String(e) });
   }
 });
 
 server.listen(PORT, () => {
-  console.error(`riff api on http://localhost:${PORT}${API_KEY ? " (auth on)" : " (open)"}`);
+  if (API_KEY) {
+    console.error(`riff api on http://localhost:${PORT} (auth on)`);
+  } else {
+    console.error(
+      `riff api on http://localhost:${PORT} (OPEN — no auth). Set RIFF_API_KEY and do NOT expose this port publicly; bind to localhost or put it behind an authenticated proxy.`,
+    );
+  }
 });

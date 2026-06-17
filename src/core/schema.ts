@@ -89,6 +89,60 @@ export interface ProductContext {
   ctaLink?: string;
 }
 
+/**
+ * Validate a parsed bundle-like object against the required shape. Returns a list
+ * of problems (empty = valid). Shared by `riff save` (agent bundles) and the
+ * self-contained LLM generator so both reject malformed output the same way.
+ */
+export function validateBundle(b: any): string[] {
+  const errs: string[] = [];
+  if (!b || typeof b !== "object") return ["not a JSON object"];
+
+  const str = (v: any) => typeof v === "string" && v.trim().length > 0;
+
+  const x = b.xArticle;
+  if (!x || typeof x !== "object") errs.push("xArticle missing");
+  else {
+    if (!str(x.hook)) errs.push("xArticle.hook missing/empty");
+    if (!str(x.body)) errs.push("xArticle.body missing/empty");
+    if (typeof x.productMention !== "string") errs.push("xArticle.productMention must be a string");
+    if (!str(x.cta)) errs.push("xArticle.cta missing/empty");
+  }
+
+  if (!Array.isArray(b.posts)) errs.push("posts must be an array");
+  else
+    b.posts.forEach((p: any, i: number) => {
+      if (!str(p?.platform)) errs.push(`posts[${i}].platform missing`);
+      if (!str(p?.text)) errs.push(`posts[${i}].text missing`);
+    });
+
+  const bl = b.blog;
+  if (!bl || typeof bl !== "object") errs.push("blog missing");
+  else {
+    if (!str(bl.title)) errs.push("blog.title missing/empty");
+    if (!str(bl.slug)) errs.push("blog.slug missing/empty");
+    if (!str(bl.metaDescription)) errs.push("blog.metaDescription missing/empty");
+    if (!Array.isArray(bl.keywords)) errs.push("blog.keywords must be an array");
+    if (!str(bl.bodyMarkdown)) errs.push("blog.bodyMarkdown missing/empty");
+  }
+
+  const v = b.videoScript;
+  if (!v || typeof v !== "object") errs.push("videoScript missing");
+  else {
+    if (!str(v.title)) errs.push("videoScript.title missing/empty");
+    if (!str(v.hook)) errs.push("videoScript.hook missing/empty");
+    if (typeof v.estDurationSec !== "number") errs.push("videoScript.estDurationSec must be a number");
+    if (!Array.isArray(v.segments) || v.segments.length === 0) errs.push("videoScript.segments must be a non-empty array");
+    else
+      v.segments.forEach((s: any, i: number) => {
+        if (!str(s?.say)) errs.push(`videoScript.segments[${i}].say missing`);
+        if (!str(s?.screen)) errs.push(`videoScript.segments[${i}].screen missing`);
+      });
+  }
+
+  return errs;
+}
+
 /** JSON Schema for the Bundle generation — fed to the LLM / agent to force structure. */
 export const BUNDLE_OUTPUT_SHAPE = {
   xArticle: {

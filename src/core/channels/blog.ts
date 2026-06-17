@@ -11,13 +11,17 @@ import type { Channel, PublishResult } from "./types.js";
 import type { Bundle } from "../schema.js";
 import { loadConfig } from "../util/config.js";
 import { injectLinks, campaignFromTrend } from "../util/links.js";
+import { escapeHtml } from "../util/html.js";
+import { log } from "../util/log.js";
 
 function mdToHtml(md: string): string {
   const lines = md.split("\n");
   const out: string[] = [];
   let inList = false;
+  // Escape raw text FIRST so any literal HTML in the model output is neutralized,
+  // then apply markdown inline transforms (their markers are ASCII and survive).
   const inline = (s: string) =>
-    s
+    escapeHtml(s)
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
       .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
       .replace(/(?<!\*)\*(?!\*)([^*]+)\*/g, "<em>$1</em>");
@@ -72,7 +76,11 @@ export const blogChannel: Channel = {
       };
     }
     const auth = Buffer.from(`${cfg.wordpressUser}:${cfg.wordpressAppPassword}`).toString("base64");
-    const endpoint = `${cfg.wordpressUrl!.replace(/\/$/, "")}/wp-json/wp/v2/posts`;
+    const base = cfg.wordpressUrl!.replace(/\/$/, "");
+    if (base.startsWith("http://") && !/^http:\/\/(localhost|127\.|\[::1\])/.test(base)) {
+      log.warn("WORDPRESS_URL is plain http — Basic auth credentials will be sent unencrypted. Use https.");
+    }
+    const endpoint = `${base}/wp-json/wp/v2/posts`;
     try {
       const res = await fetch(endpoint, {
         method: "POST",

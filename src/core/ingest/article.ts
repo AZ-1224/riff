@@ -4,17 +4,8 @@
  * or the densest text block, decodes entities, collapses whitespace.
  */
 import type { Source } from "../schema.js";
-
-function decodeEntities(s: string): string {
-  return s
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;|&apos;/g, "'")
-    .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n));
-}
+import { decodeEntities } from "../util/html.js";
+import { fetchWithTimeout, assertPublicHttpUrl } from "../util/net.js";
 
 function stripTags(html: string): string {
   return html
@@ -30,21 +21,25 @@ function extractTitle(html: string): string {
 }
 
 export async function ingestArticle(url: string): Promise<Source> {
-  const res = await fetch(url, {
-    headers: { "user-agent": "Mozilla/5.0 (riff content ingest)" },
-    redirect: "follow",
-  });
+  assertPublicHttpUrl(url);
+  const res = await fetchWithTimeout(
+    url,
+    { headers: { "user-agent": "Mozilla/5.0 (riff content ingest)" }, redirect: "follow" },
+    15000,
+  );
   if (!res.ok) throw new Error(`Fetch failed: ${res.status} ${res.statusText} for ${url}`);
   const html = await res.text();
 
   const title = extractTitle(html);
 
-  // Prefer semantic containers, else whole body.
+  // Prefer semantic containers. If none match, use an empty string rather than
+  // the full document (avoids extracting <head>/scripts as junk); the length
+  // guard below then reports a clear error.
   const container =
     html.match(/<article[\s\S]*?<\/article>/i)?.[0] ||
     html.match(/<main[\s\S]*?<\/main>/i)?.[0] ||
     html.match(/<body[\s\S]*?<\/body>/i)?.[0] ||
-    html;
+    "";
 
   const cleaned = container
     .replace(/<script[\s\S]*?<\/script>/gi, " ")

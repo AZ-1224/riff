@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
-import { loadSource, saveBundle, loadProduct } from "../core/store.js";
-import type { Bundle } from "../core/schema.js";
+import { loadSource, saveBundle, loadProduct, assertSafeSlug } from "../core/store.js";
+import { validateBundle, type Bundle } from "../core/schema.js";
+import { extractJson } from "../core/util/json.js";
 import { log } from "../core/util/log.js";
 
 interface Args {
@@ -8,35 +9,22 @@ interface Args {
   file?: string;
 }
 
-function validate(b: any): string[] {
-  const errs: string[] = [];
-  if (!b || typeof b !== "object") return ["not a JSON object"];
-  if (!b.xArticle?.hook) errs.push("xArticle.hook missing");
-  if (!b.xArticle?.body) errs.push("xArticle.body missing");
-  if (!Array.isArray(b.posts)) errs.push("posts must be an array");
-  if (!b.blog?.title || !b.blog?.bodyMarkdown) errs.push("blog.title / blog.bodyMarkdown missing");
-  if (!b.videoScript?.segments || !Array.isArray(b.videoScript.segments))
-    errs.push("videoScript.segments must be an array");
-  return errs;
-}
-
 /** Store an agent-produced JSON bundle (from `riff brief`). Reads file arg or stdin. */
 export async function cmdSave(args: Args): Promise<void> {
   if (!args.slug) throw new Error("Usage: riff save <slug> [bundle.json]   (or pipe JSON via stdin)");
+  assertSafeSlug(args.slug);
   const raw = args.file ? readFileSync(args.file, "utf8") : readFileSync(0, "utf8");
   if (!raw.trim()) throw new Error("No JSON provided (give a file path or pipe via stdin).");
 
-  // Tolerate fenced or prose-wrapped JSON.
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
+  // Tolerate fenced or prose-wrapped JSON; balanced-brace extraction.
   let parsed: any;
   try {
-    parsed = JSON.parse(raw.slice(start, end + 1));
+    parsed = extractJson(raw);
   } catch (e: any) {
     throw new Error(`Could not parse JSON: ${e.message}`);
   }
 
-  const errs = validate(parsed);
+  const errs = validateBundle(parsed);
   if (errs.length) throw new Error("Invalid bundle:\n  - " + errs.join("\n  - "));
 
   const source = loadSource(args.slug);

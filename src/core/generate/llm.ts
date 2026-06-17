@@ -5,20 +5,14 @@
  * where the buyer's own agent does this reasoning for free.
  */
 import type { Source, Bundle, ProductContext, XArticle } from "../schema.js";
+import { validateBundle } from "../schema.js";
 import { SYSTEM_PROMPT, buildUserPrompt, buildRepegPrompt } from "./prompts.js";
 import { loadConfig } from "../util/config.js";
+import { extractJson } from "../util/json.js";
+import { fetchWithTimeout } from "../util/net.js";
 
 const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
 const ANTHROPIC_VERSION = "2023-06-01";
-
-function extractJson(text: string): any {
-  const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-  const raw = fenced ? fenced[1] : text;
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-  if (start === -1 || end === -1) throw new Error("Model returned no JSON object.");
-  return JSON.parse(raw.slice(start, end + 1));
-}
 
 async function anthropic(system: string, user: string, maxTokens: number): Promise<string> {
   const cfg = loadConfig();
@@ -28,15 +22,19 @@ async function anthropic(system: string, user: string, maxTokens: number): Promi
         "agent-driven flow (let Claude Code / your agent generate).",
     );
   }
-  const res = await fetch(ANTHROPIC_URL, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": cfg.anthropicApiKey,
-      "anthropic-version": ANTHROPIC_VERSION,
+  const res = await fetchWithTimeout(
+    ANTHROPIC_URL,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": cfg.anthropicApiKey,
+        "anthropic-version": ANTHROPIC_VERSION,
+      },
+      body: JSON.stringify({ model: cfg.anthropicModel, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }] }),
     },
-    body: JSON.stringify({ model: cfg.anthropicModel, max_tokens: maxTokens, system, messages: [{ role: "user", content: user }] }),
-  });
+    120000,
+  );
   if (!res.ok) {
     const detail = await res.text().catch(() => "");
     throw new Error(`Anthropic API ${res.status}: ${detail.slice(0, 500)}`);
@@ -57,12 +55,13 @@ export async function repegWithLLM(
     3000,
   );
   const p = extractJson(text);
+  const keep = (v: any, fallback: string) => (typeof v === "string" && v.trim() ? v : fallback);
   return {
-    hook: p.hook ?? current.hook,
-    body: p.body ?? current.body,
-    productMention: p.productMention ?? current.productMention,
-    cta: p.cta ?? current.cta,
-    trendPeg: p.trendPeg ?? newTrend,
+    hook: keep(p.hook, current.hook),
+    body: keep(p.body, current.body),
+    productMention: typeof p.productMention === "string" ? p.productMention : current.productMention,
+    cta: keep(p.cta, current.cta),
+    trendPeg: keep(p.trendPeg, newTrend),
   };
 }
 
@@ -73,6 +72,11 @@ export async function generateWithLLM(
 ): Promise<Bundle> {
   const text = await anthropic(SYSTEM_PROMPT, buildUserPrompt(source, product, trendPeg), 8000);
   const parsed = extractJson(text);
+
+  const errs = validateBundle(parsed);
+  if (errs.length) {
+    throw new Error("Model returned an incomplete bundle:\n  - " + errs.join("\n  - "));
+  }
 
   return {
     source: { type: source.type, url: source.url, title: source.title },

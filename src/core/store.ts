@@ -8,8 +8,23 @@
 import { mkdirSync, writeFileSync, readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Source, Bundle, ProductContext } from "./schema.js";
+import { log } from "./util/log.js";
 
 const ROOT = () => resolve(process.cwd(), ".riff");
+
+/** Thrown when a workspace/bundle is requested but doesn't exist (→ map to 404). */
+export class NotFoundError extends Error {}
+
+/**
+ * Reject any slug that could escape the .riff/ workspace via path traversal.
+ * Slugs are produced by slugify() internally; this guards the entry points where
+ * a slug is user/agent-supplied (CLI --slug/positional, API URL path, MCP args).
+ */
+export function assertSafeSlug(slug: unknown): asserts slug is string {
+  if (typeof slug !== "string" || slug.length === 0 || slug.length > 80 || !/^[a-z0-9][a-z0-9-]*$/i.test(slug)) {
+    throw new Error(`Invalid slug "${String(slug)}" — use letters, numbers, and hyphens only.`);
+  }
+}
 
 export interface WorkspaceInfo {
   slug: string;
@@ -39,8 +54,8 @@ export function listWorkspaces(): WorkspaceInfo[] {
         const b: Bundle = JSON.parse(readFileSync(bundlePath, "utf8"));
         trendPeg = b.xArticle?.trendPeg;
         posts = b.posts?.length;
-      } catch {
-        /* ignore */
+      } catch (e: any) {
+        log.warn(`Corrupt bundle.json in "${name}" — skipping its details (${e?.message || "parse error"}).`);
       }
     }
     out.push({
@@ -66,6 +81,7 @@ export function slugify(s: string): string {
 }
 
 export function workspaceDir(slug: string): string {
+  assertSafeSlug(slug);
   return resolve(ROOT(), slug);
 }
 
@@ -82,7 +98,7 @@ export function saveSource(slug: string, source: Source): void {
 
 export function loadSource(slug: string): Source {
   const p = resolve(workspaceDir(slug), "source.json");
-  if (!existsSync(p)) throw new Error(`No ingested source for "${slug}". Run: riff ingest <url> first.`);
+  if (!existsSync(p)) throw new NotFoundError(`No ingested source for "${slug}". Run: riff ingest <url> first.`);
   return JSON.parse(readFileSync(p, "utf8"));
 }
 
@@ -93,7 +109,7 @@ export function saveBundle(slug: string, bundle: Bundle): void {
 
 export function loadBundle(slug: string): Bundle {
   const p = resolve(workspaceDir(slug), "bundle.json");
-  if (!existsSync(p)) throw new Error(`No bundle for "${slug}". Run: riff repurpose ${slug} first.`);
+  if (!existsSync(p)) throw new NotFoundError(`No bundle for "${slug}". Run: riff repurpose ${slug} first.`);
   return JSON.parse(readFileSync(p, "utf8"));
 }
 

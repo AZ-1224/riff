@@ -40,5 +40,5 @@ export function matchStockpile(trend: Trend, stock: WorkspaceInfo[]): Match[] {
       for (const t of want) if (have.has(t)) score++;
       return { slug: w.slug, title: w.title, score, trendPeg: w.trendPeg };
     })
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => b.score - a.score || a.slug.localeCompare(b.slug));
 }

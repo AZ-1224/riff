@@ -8,8 +8,10 @@ import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import type { Source } from "../schema.js";
+import { decodeEntities } from "../util/html.js";
 
 const exec = promisify(execFile);
+const EXEC_OPTS = { maxBuffer: 64 * 1024 * 1024, timeout: 120000 };
 
 export function isYouTube(url: string): boolean {
   return /(?:youtube\.com\/watch|youtu\.be\/|youtube\.com\/shorts\/)/.test(url);
@@ -23,24 +25,25 @@ interface VttCue {
 function parseVtt(vtt: string): VttCue[] {
   const cues: VttCue[] = [];
   let prev = "";
+  let prevT = -Infinity;
   let curT = 0;
   for (const raw of vtt.split("\n")) {
     const line = raw.replace(/\r$/, "");
-    const m = line.match(/^(\d{2}):(\d{2}):(\d{2})\.\d{3}\s+-->/);
+    // Accept 1-2 digit hours and optional milliseconds (VTT spec is lenient).
+    const m = line.match(/^(\d{1,2}):(\d{2}):(\d{2})(?:\.\d{1,3})?\s+-->/);
     if (m) {
       curT = +m[1] * 3600 + +m[2] * 60 + +m[3];
       continue;
     }
     if (!line.trim() || /^(WEBVTT|Kind:|Language:)/.test(line)) continue;
-    const text = line
-      .replace(/<[^>]+>/g, "")
-      .replace(/&gt;/g, ">")
-      .replace(/&lt;/g, "<")
-      .replace(/&amp;/g, "&")
-      .trim();
-    if (!text || text === prev) continue;
+    const text = decodeEntities(line.replace(/<[^>]+>/g, "")).trim();
+    if (!text) continue;
+    // Only drop a repeat if it's adjacent in time (caption roll-up artifact),
+    // not a legitimate repeated phrase later in the transcript.
+    if (text === prev && curT - prevT < 1) continue;
     cues.push({ t: curT, text });
     prev = text;
+    prevT = curT;
   }
   return cues;
 }
@@ -49,9 +52,7 @@ export async function ingestYouTube(url: string): Promise<Source> {
   const dir = mkdtempSync(resolve(tmpdir(), "riff-yt-"));
   try {
     // Metadata
-    const { stdout: metaRaw } = await exec("yt-dlp", ["--no-warnings", "--dump-single-json", url], {
-      maxBuffer: 64 * 1024 * 1024,
-    });
+    const { stdout: metaRaw } = await exec("yt-dlp", ["--no-warnings", "--dump-single-json", url], EXEC_OPTS);
     const meta = JSON.parse(metaRaw);
 
     // Captions (manual first, then auto-generated)
@@ -70,7 +71,7 @@ export async function ingestYouTube(url: string): Promise<Source> {
         resolve(dir, "sub"),
         url,
       ],
-      { maxBuffer: 64 * 1024 * 1024 },
+      EXEC_OPTS,
     ).catch(() => {
       /* captions may be absent; handled below */
     });
