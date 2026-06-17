@@ -1,7 +1,7 @@
 /**
  * Self-contained generator (--llm mode). Calls the Anthropic Messages API via
  * fetch (no SDK dep, so `npx riffkit` stays zero-install). Used for unattended
- * / cron runs. The default product path is agent-driven (see skill/skill.md),
+ * / cron runs. The default product path is agent-driven (see skill.md),
  * where the buyer's own agent does this reasoning for free.
  */
 import type { Source, Bundle, ProductContext, XArticle } from "../schema.js";

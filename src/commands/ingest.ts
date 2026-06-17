@@ -33,6 +33,6 @@ export async function cmdIngest(args: Args): Promise<string> {
   const slug = args.slug || slugify(source.title);
   saveSource(slug, source);
   log.ok(`Ingested "${source.title}" (${source.text.length} chars) → .riff/${slug}/source.json`);
-  log.info(`Next: riff repurpose ${slug}   (add --llm for unattended, or let your agent generate — see skill/skill.md)`);
+  log.info(`Next: riff repurpose ${slug}   (add --llm for unattended, or let your agent generate — see skill.md)`);
   return slug;
 }

@@ -68,7 +68,7 @@ Each channel is one file under `src/core/channels/` — swap `social.ts` to publ
 
 1. **API** (`api/server.ts`) — `npm run api`. The foundation; everything else calls it.
 2. **CLI** (`riff`) — short commands, less context rot for agents than raw API.
-3. **Skill** (`skill/skill.md`) — `npx skills add <repo>`; what local agents install.
+3. **Skill** (`skill.md`) — `npx skills add https://github.com/AZ-1224/riff`; what local agents install.
 4. **MCP** (`mcp/server.ts`) — `npm run mcp`; for remote agents.
 
 ## How the bundle is shaped
