@@ -1,0 +1,72 @@
+{
+  "xArticle": {
+    "trendPeg": "the next users of SaaS are agents",
+    "hook": "I kept seeing the same advice: make your product agent-ready, then put a trend-pegged article in front of people the moment a release drops. So I built the tool that does both. It's open source. Here's how it works.",
+    "body": "It's called Riff. You give it one source — a YouTube video, an article, a blog post — and it fans that out into:\n\n- a trend-pegged X article (the headline asset)\n- a week of platform-tailored posts\n- a real-value SEO blog post\n- a split-screen avatar video script\n\nThen it publishes them. Markdown to disk always, plus Postiz, WordPress, and HeyGen when you add keys.\n\nThe part I care about most: it's built the agent-native way, in the order that actually works. API, then a CLI, then one skill.md file, then an MCP endpoint. So a human, a Claude Code session, a Cursor user, or someone on ChatGPT can all drive it. The agent does the writing, so there's no token cost to run it.\n\nTwo commands make it more than a repurposer:\n- `repeg` swaps the trend on top of an already-written article, so you can fire first when a release lands\n- `stock` shows your whole stockpile of articles ready to go\n\nEvery link it writes is UTM-tracked per channel, so you can see which trend actually converted.\n\nThe one rule it won't break: no em-dash spray, no hashtag spam, no invented stats. Every claim has to trace to the source. In a feed full of generated slop, the thing that reads like a real person wins.",
+    "productMention": "Riff is MIT-licensed and runs with zero paid dependencies — export to markdown needs no keys at all.",
+    "cta": "It's free and open source. Install it as an agent skill or just clone it: {{LINK}}"
+  },
+  "posts": [
+    {
+      "platform": "x",
+      "threadOrder": 1,
+      "text": "Built an open-source tool that turns one video into a week of content across every channel.\n\nThe twist: your AI agent does the writing, not an API you pay per call. Zero token cost to run.\n\nWhat it does 🧵",
+      "mediaHint": "screenshot:terminal riff stock output"
+    },
+    {
+      "platform": "x",
+      "threadOrder": 2,
+      "text": "One source in:\n- YouTube video\n- an article\n- a blog post\n\nFour things out:\n- a trend-pegged X article\n- a week of platform posts\n- a real-value SEO blog post\n- a split-screen video script\n\nThen it publishes them."
+    },
+    {
+      "platform": "x",
+      "threadOrder": 3,
+      "text": "It's built API → CLI → skill → MCP, so it works from Claude Code, Cursor, or ChatGPT.\n\nTwo commands matter most:\n`repeg` swaps the trend on top of a written article so you fire first.\n`stock` shows everything ready to go."
+    },
+    {
+      "platform": "x",
+      "threadOrder": 4,
+      "text": "The rule it won't break: no em-dash spray, no hashtag spam, no invented stats. Every claim traces to the source.\n\nIn a feed full of generated slop, reading like a real person is the moat.\n\nFree, MIT, clone it: {{LINK}}"
+    },
+    {
+      "platform": "linkedin",
+      "text": "The founders who win each model-release cycle aren't the ones with the best model. They're the ones whose product the model can actually use, and who can get a relevant, tracked article in front of the right people the moment a trend lands.\n\nI built an open-source tool around exactly that. Riff takes one source and produces a trend-pegged article, a week of posts, an SEO blog post, and a video script, then publishes them. It's agent-native, so the agent does the writing and there's no per-call cost. Every link is UTM-tracked so you can see which trend actually converted.\n\nIt's MIT-licensed. Link in the comments.",
+      "mediaHint": "screenshot:x-article output"
+    },
+    {
+      "platform": "threads",
+      "text": "Open-sourced a content tool today. One source in, a week of cross-channel content out, your own agent does the writing. No per-call cost. Anti-slop by default."
+    },
+    {
+      "platform": "instagram",
+      "text": "One video → a week of content across every platform. Your AI agent writes it, you keep the receipts (every link tracked). Free and open source. Link in bio.",
+      "mediaHint": "avatar-video"
+    }
+  ],
+  "blog": {
+    "title": "Riff: Turn One Video Into a Week of Content, Agent-Native and Open Source",
+    "slug": "riff-agent-native-content-repurposing",
+    "metaDescription": "Riff is an open-source, agent-native content repurposing engine. One source becomes a trend-pegged X article, a week of posts, an SEO blog post, and a video script.",
+    "keywords": [
+      "content repurposing tool",
+      "agent-native",
+      "open source content tool",
+      "repurpose youtube video",
+      "MCP server",
+      "agent skill"
+    ],
+    "bodyMarkdown": "## The problem Riff solves\n\nEvery model release follows the same curve: a spike of attention, then a fade. The builders who convert that spike are the ones who are already agent-ready when it lands, and who can put a relevant, tracked article in front of the right people fast. Doing that by hand for every channel is slow, and most of the output ends up reading like generated slop.\n\nRiff is an open-source tool that automates the fan-out without the slop. You give it one source and it produces a full multi-channel bundle.\n\n## What it produces\n\nFrom a single YouTube video, article, or blog post, Riff generates:\n\n- A **trend-pegged X article**, the headline asset, written to ride a current release.\n- A **week of platform-tailored posts** across X, LinkedIn, Instagram, and Threads.\n- A **real-value SEO blog post** in third person, with the product woven in.\n- A **split-screen avatar video script** ready for a tool like HeyGen.\n\nIt then publishes them: Markdown to disk with no keys required, plus Postiz, WordPress, and HeyGen when configured.\n\n## Why it's agent-native\n\nRiff is built in the order that works: a public API, a CLI published to npm, a single skill.md file in a GitHub repo, and an MCP endpoint. That means it can be driven from Claude Code, Cursor, or ChatGPT. The buyer's own agent does the writing, so there is no per-call token cost to operate it.\n\nTwo commands set it apart from a plain repurposer. The `repeg` command swaps the trend on top of an already-written article so you can fire first when a release drops. The `stock` command shows your entire stockpile of articles ready to go. Every link it writes is UTM-tracked per channel, so you can measure which trend actually drove signups.\n\n## The anti-slop rule\n\nThe generation prompt bans em-dash spray, hashtag spam, and invented statistics. Every claim must trace back to the source. In a feed drowning in generated content, the output that reads like a real human operator is the one that wins.\n\nRiff is MIT-licensed and runs with zero paid dependencies. You can install it as an agent skill or clone the repository directly."
+  },
+  "videoScript": {
+    "title": "I open-sourced a tool that turns 1 video into a week of content",
+    "estDurationSec": 38,
+    "hook": "I open-sourced a tool that turns one video into a week of content, and your AI does the writing.",
+    "segments": [
+      { "say": "Here's the problem. Every model release spikes, then fades. The builders who win are agent-ready when it lands.", "screen": "text overlay: spike then fade graph" },
+      { "say": "So I built Riff. One source in: a video, an article, a post.", "screen": "screenshot:riff ingest command" },
+      { "say": "Four things out: a trend-pegged X article, a week of posts, an SEO blog post, and a video script. Then it publishes them.", "screen": "screenshot:outputs folder, four markdown files" },
+      { "say": "It's agent-native. Your own agent does the writing, so there's no per-call cost. And every link is tracked so you know which trend converted.", "screen": "screenshot:tracked utm link" },
+      { "say": "One rule it won't break: no slop. Every claim traces to the source. It's free and open source.", "screen": "text overlay: MIT licensed, github.com/AZ-1224/riff" }
+    ]
+  }
+}

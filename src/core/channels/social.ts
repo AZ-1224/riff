@@ -10,6 +10,7 @@
 import type { Channel, PublishResult } from "./types.js";
 import type { Bundle } from "../schema.js";
 import { loadConfig } from "../util/config.js";
+import { injectLinks, campaignFromTrend } from "../util/links.js";
 
 export const socialChannel: Channel = {
   name: "social",
@@ -28,10 +29,13 @@ export const socialChannel: Channel = {
 
     const refs: string[] = [];
     const errors: string[] = [];
+    const base = bundle.product?.ctaLink || bundle.product?.url;
+    const campaign = campaignFromTrend(bundle.xArticle.trendPeg);
     // One scheduled post per bundle post. Postiz expects a list of integration
     // targets; we leave `integrations` empty so the user's default channels apply.
     for (const post of bundle.posts) {
       try {
+        const content = injectLinks(post.text, base, { source: post.platform, campaign });
         const res = await fetch(`${cfg.postizBaseUrl}/public/v1/posts`, {
           method: "POST",
           headers: {
@@ -40,7 +44,7 @@ export const socialChannel: Channel = {
           },
           body: JSON.stringify({
             type: "draft", // draft, not auto-fire — review before publish
-            content: post.text,
+            content,
             tags: [`riff`, post.platform],
           }),
         });

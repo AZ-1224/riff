@@ -10,6 +10,7 @@
 import type { Channel, PublishResult } from "./types.js";
 import type { Bundle } from "../schema.js";
 import { loadConfig } from "../util/config.js";
+import { injectLinks, campaignFromTrend } from "../util/links.js";
 
 function mdToHtml(md: string): string {
   const lines = md.split("\n");
@@ -80,7 +81,12 @@ export const blogChannel: Channel = {
           title: bundle.blog.title,
           slug: bundle.blog.slug,
           status: "draft",
-          content: mdToHtml(bundle.blog.bodyMarkdown),
+          content: mdToHtml(
+            injectLinks(bundle.blog.bodyMarkdown, bundle.product?.ctaLink || bundle.product?.url, {
+              source: "wordpress",
+              campaign: campaignFromTrend(bundle.xArticle.trendPeg),
+            }),
+          ),
           excerpt: bundle.blog.metaDescription,
         }),
       });
