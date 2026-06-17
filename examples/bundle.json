@@ -1,0 +1,78 @@
+{
+  "xArticle": {
+    "trendPeg": "agents are the next users of SaaS",
+    "hook": "One guy. One social media scheduler. $118K/month. He was stuck at $21K for 18 months until he changed one thing: he started selling to AI agents instead of humans.",
+    "body": "His name is Nevo David. The product is Postiz, an open-source post scheduler in a market that's existed for 20 years (Hootsuite, Buffer).\n\nFor a year and a half he ground to $21K/month. Then OpenClaw blew up and he did one thing fast: made Postiz installable by agents.\n\n3 months later: $118K/month. Solo.\n\nHere's the part nobody expects. His churn is 14.6%. That's brutally high. Normally that kills you. But it doesn't, because agents fix churn at the source.\n\nA human scheduler gets bored and cancels. But when you tell an agent \"read this article, write me a month of posts,\" the queue is full for a month. Full queue = they stay. The agent does the work that used to make people quit.\n\nThe whole build is one markdown file:\n- have a public API\n- ask Claude to turn the API docs into a CLI, publish to npm\n- write one skill.md describing the CLI, drop it in a GitHub repo\n- add an MCP endpoint for the ChatGPT/Claude.ai crowd\n\nThat's it. Any product built for humans becomes agent-ready in an afternoon.\n\nWhy a CLI and not just the API? Two reasons he gave: a CLI call is short, so it doesn't rot the agent's context window the way a giant JSON request does. And the API key stays out of the context window.",
+    "productMention": "Postiz is open source and supports 30+ platforms, which is exactly why an agent can schedule a whole month across all of them in one shot.",
+    "cta": "Full breakdown (the dashboard, the 7.2M-view article, the build order) is worth studying if you've got a product built for humans. Try it: {{LINK}}"
+  },
+  "posts": [
+    {
+      "platform": "x",
+      "threadOrder": 1,
+      "text": "A 200-follower account posted about a $21K/month tool and got 7.2 million views.\n\nThat single post took the founder from $21K to growing $2-3K MRR per day.\n\nThe mechanic behind it 🧵",
+      "mediaHint": "screenshot:revenue-spike-february"
+    },
+    {
+      "platform": "x",
+      "threadOrder": 2,
+      "text": "X stopped being follower-based. It's interest-based now.\n\nIf your post matches a trend a lot of people care about, the algorithm matches you to them — even with 200 followers.\n\nThe writer pegged his post to OpenClaw at its absolute peak. That's why it flew."
+    },
+    {
+      "platform": "x",
+      "threadOrder": 3,
+      "text": "So the play isn't \"build in public.\" It's trend-jacking:\n\n- watch the X trending feed\n- pre-write articles about the next big model/agent release\n- when it drops, swap the title, fire first\n\nNevo keeps articles ready and just changes the peg to the newest release."
+    },
+    {
+      "platform": "x",
+      "threadOrder": 4,
+      "text": "Free distribution version (no paid creators):\n\nQuote-tweet your own article repeatedly, each time with a different 30-sec clip from a relevant YouTube video.\n\nOne creator does this solo and pulls 142K views on a single quote. Every quote is unique content, so no demonetization."
+    },
+    {
+      "platform": "linkedin",
+      "text": "A counterintuitive lesson from a founder doing $118K/month solo with an open-source product:\n\nHigh churn didn't kill him. 14.6% churn is dangerous in normal SaaS. But he sells to AI agents now, and agents quietly fix churn.\n\nThe reason is simple. A person scheduling posts manually gets discouraged and cancels. An agent that generates a month of content in one command leaves the customer with a full queue. A full queue is a reason to stay.\n\nIf you run a marketing or content product, the question isn't \"how do I reduce churn with emails and tricks.\" It's \"can an agent do enough of the work that there's nothing left to churn from.\"",
+      "mediaHint": "screenshot:dashboard"
+    },
+    {
+      "platform": "instagram",
+      "text": "Stuck at $21K/month for 18 months → $118K/month in 3 months.\n\nOne change: he made his product something AI agents could use, not just humans.\n\nSave this if you're building.",
+      "mediaHint": "avatar-video"
+    },
+    {
+      "platform": "threads",
+      "text": "The agent-ready stack, in order: API → CLI → one skill.md file → MCP.\n\nThat's the whole thing. A product built for humans becomes agent-ready in an afternoon."
+    },
+    {
+      "platform": "x",
+      "threadOrder": 5,
+      "text": "He gave away 3 ideas he's too busy to build:\n\n1. A backlink-exchange agent (reads SEO outreach, vets DR, places + monitors links)\n2. A content repurposing engine (1 source → posts + SEO article + avatar video)\n3. Take any crowded G2 category and rebuild the top tool agent-native\n\nNone require inventing anything new."
+    }
+  ],
+  "blog": {
+    "title": "How a Solo Founder Hit $118K/Month by Selling to AI Agents (Not Humans)",
+    "slug": "selling-saas-to-ai-agents-postiz-playbook",
+    "metaDescription": "Nevo David grew Postiz from $21K to $118K a month in three months by making his product agent-ready. Here's the API-to-MCP playbook and the X distribution hack.",
+    "keywords": [
+      "selling to AI agents",
+      "agent-ready SaaS",
+      "MCP server",
+      "agent skills",
+      "content repurposing",
+      "social media scheduler API"
+    ],
+    "bodyMarkdown": "## The $21K plateau that broke open\n\nFor a year and a half, Nevo David's open-source social media scheduler, Postiz, sat around $21,000 a month. It competed in a category two decades old, against Hootsuite and Buffer. His only edge was that the product was open source.\n\nThen, in the span of three months, Postiz went from $21K to $118K a month, run by one person. The change wasn't a new feature or a funding round. It was a repositioning: David stopped selling to humans and started selling to AI agents.\n\n## Why agents quietly fix churn\n\nThe most surprising number on David's dashboard is the churn: 14.6%. In a normal SaaS, that figure is a slow death. Marketing tools churn hard because people get discouraged and cancel.\n\nAgents change the math. When a customer tells an agent to read an article and generate a month of posts, the scheduling queue fills up in one command. A full queue is a reason to stay. The agent performs the very work that used to make people quit, so retention improves at the source instead of being patched with retention emails.\n\nThe high churn becomes survivable because the agent funnel is a firehose: at any moment Postiz has hundreds of trials running.\n\n## The agent-ready stack, in one file\n\nDavid's build order is deliberately boring, which is the point. Any product built for humans can follow it in an afternoon:\n\n1. **Public API.** The foundation. Most products already have one.\n2. **CLI.** Ask the model to turn the API docs into a command-line tool, then publish it to npm. A CLI call is short, so it doesn't flood the agent's context window the way a large JSON request would, and the API key stays out of that window.\n3. **skill.md.** A single Markdown file describing the CLI, dropped into a GitHub repo and installed with `npx skills add`.\n4. **MCP.** A remote endpoint for users on ChatGPT and Claude.ai who can't run local skills.\n\nCover all four and the same product serves every agent surface at once.\n\n## The distribution hack: trend-jacking on X\n\nThe growth didn't come from a launch. It came from one article posted by a 200-follower account that pulled 7.2 million views. The reason is that X rewards interest, not follower count. Content that matches a trending topic gets matched to the people who care about it, regardless of audience size. The article was pegged to OpenClaw at its peak.\n\nThe repeatable version: watch the trending feed, pre-write articles about upcoming model and agent releases, and publish first when one drops. For amplification without a budget, quote-tweet the same article repeatedly, each time pairing it with a different short clip from a relevant video, so each post counts as unique content.\n\n## Where a tool like Riff fits\n\nThe third idea David gave away was a content repurposing engine: one source turned into platform posts, an SEO article, and a short avatar video. That is exactly the shape of an agent-native content tool, and it is built the same way Postiz was: API first, then a CLI, then a skill, then an MCP. The lesson underneath all of it is that you don't need a brand-new idea. You take something proven and put your own agent-native spin on it."
+  },
+  "videoScript": {
+    "title": "He sells to robots, not humans ($118K/mo solo)",
+    "estDurationSec": 42,
+    "hook": "This guy makes $118,000 a month selling to AI agents instead of people.",
+    "segments": [
+      { "say": "One founder. One open-source social scheduler. He was stuck at 21 thousand a month for a year and a half.", "screen": "screenshot:postiz dashboard, MRR chart" },
+      { "say": "Then he changed one thing. He made his product usable by AI agents, not just humans.", "screen": "clip:00:50-01:05 agent prompt scheduling posts" },
+      { "say": "Three months later he's at 118 thousand a month. Solo. And here's the wild part: his churn is fourteen point six percent.", "screen": "zoom:churn number on dashboard" },
+      { "say": "That should kill him. It doesn't, because agents fix churn. When an agent writes you a month of posts, your queue is full, so you stay.", "screen": "split:agent generating a month of posts" },
+      { "say": "The whole build is one markdown file: an API, a CLI, a skill, an MCP. Any product becomes agent-ready in an afternoon.", "screen": "text overlay: API → CLI → skill.md → MCP" },
+      { "say": "Follow for the full playbook.", "screen": "avatar-video, end card" }
+    ]
+  }
+}

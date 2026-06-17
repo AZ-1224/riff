@@ -1,0 +1,43 @@
+{
+  "name": "riffkit",
+  "version": "0.1.0",
+  "description": "Riff — one source, every channel. Agent-native content repurposing: turn one X article / YouTube video / blog post into a week of platform posts, an SEO article, and a short-form video script.",
+  "type": "module",
+  "bin": {
+    "riff": "dist/src/cli.js"
+  },
+  "files": [
+    "dist",
+    "skill",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node -e \"import('node:fs').then(fs=>fs.chmodSync('dist/src/cli.js',0o755))\"",
+    "dev": "node --import tsx src/cli.ts",
+    "api": "node --import tsx api/server.ts",
+    "mcp": "node --import tsx mcp/server.ts",
+    "start": "node dist/src/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai-agents",
+    "content-repurposing",
+    "mcp",
+    "agent-skill",
+    "cli",
+    "social-media",
+    "seo",
+    "claude",
+    "agent-native"
+  ],
+  "author": "AZ AI",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
