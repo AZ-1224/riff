@@ -142,28 +142,3 @@ export function validateBundle(b: any): string[] {
 
   return errs;
 }
-
-/** JSON Schema for the Bundle generation — fed to the LLM / agent to force structure. */
-export const BUNDLE_OUTPUT_SHAPE = {
-  xArticle: {
-    hook: "string — scroll-stopping first line, no clickbait lies",
-    body: "string — the value, plain text, line breaks, no hashtag spam",
-    productMention: "string — one credible line mentioning the product naturally",
-    cta: "string — closing CTA, use {{LINK}} where the link goes",
-    trendPeg: "string — the trend/release this rides (e.g. 'Claude Opus 4.8 launch')",
-  },
-  posts: "array of { platform, text, threadOrder?, mediaHint? } — a week of tailored posts",
-  blog: {
-    title: "string",
-    slug: "string-kebab-case",
-    metaDescription: "string <=155 chars",
-    keywords: "array of string",
-    bodyMarkdown: "string — third-person SEO article, real value, product woven in",
-  },
-  videoScript: {
-    title: "string",
-    estDurationSec: "number 20-60",
-    hook: "string — first 2 seconds",
-    segments: "array of { say, screen } — split-screen avatar script",
-  },
-} as const;

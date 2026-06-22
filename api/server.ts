@@ -12,8 +12,7 @@
  * Start: npm run api   (PORT=8787 by default)
  */
 import { createServer } from "node:http";
-import { ingest } from "../src/core/ingest/index.js";
-import { ingestText } from "../src/core/ingest/index.js";
+import { ingest, ingestText } from "../src/core/ingest/index.js";
 import {
   saveSource,
   loadSource,
